@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>
+            Stanza
+        </title>
+        <link rel="stylesheet" href="table.css">
+    </head>
+    <body>
+        <h1><%= numbers[0].city_name %></h1>
+        <h3>Total Number of Institutes : <%= numbers[0].num_institutions %></h3>
+        <h3>Total Number of PGs : <%= numbers[0].num_properties %></h3>
+        <h3>Total Number of Rooms : <%= totalroom[0].total_rooms %></h3>
+        <table>
+            <tr>
+                <th>Institute name</th>
+                <th>Student Enrollment</th>
+                <th>Number of PG within 3KM</th>
+                <th>Localities</th>
+                <th>Average Pricing</th>
+                <th>URL</th>
+            </tr>
+            <% insti_list.forEach(function(insti){ %>
+                <tr>
+                    <td><a href="<%= url + insti.latitude + "%2C" + insti.longitude + "&z=17" %>" target="_blank"><%= insti.institute_name %></a></td>
+                    <td><%= insti.student_enrollment_count %></td>
+                    <td><%= insti.ep_id %></td>
+                    <td><%= insti.groupc %></td>
+                    <td>₹<%= insti.AVG_PRICING %></td>
+                    <td><a href="<%= insti.url %>" target="_blank" >View More</a></td>
+                </tr>
+            <% }) %>
+        </table>
+    </body>
+</html>

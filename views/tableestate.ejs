@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <title>Stanza Real Estate</title>
+        <link rel="stylesheet" href="tableestate.css">
+    </head>
+    <body>
+        <div style = "width: 100vw; margin: 0 auto;">
+            <div style = "float: right; width: 50%; height: 100vh;">
+                <div  style = "position: fixed;"">
+                    <iframe src="<%= url %>" width="640" height="480" align="right"></iframe>
+                </div>
+            </div>
+            <div style = "float: left; width: 50%;">
+                <table>
+                    <tr>
+                        <th>No of Nearby Institutions</th>
+                        <th>Total Students</th>
+                        <th>No of Nearby PG</th>
+                        <th>No of Rooms in PGs</th>
+                        <th style="background-color: greenyellow;">Average Price of PG</th>
+                        <th>No of Nearby Rental</th>
+                        <th>No of Rooms in Rentalss</th>
+                        <th style="background-color: orangered;">Average Price of Rental</th>
+                    </tr>
+                    <tr>
+                <td><%= r1[0].NEARBY_INSTITUTIONS %></td>
+                <td><%= r1[0].TOTAL_STUDENTS %></td>
+                <td><%= r2[0].NEARBY_PG %></td>
+                <td><%= r2[0].TOTAL_ROOMS %></td>
+                <td style="background-color: greenyellow;"><%= r2[0].AVG_PG_PRICING %></td>
+                <td><%= r3[0].NEARBY_RENTAL_PLACES %></td>
+                <td><%= r3[0].TOTAL_RENTAL_ROOMS %></td>
+                <td style="background-color: orangered;"><%= r3[0].AVG_RENTAL_PRICING %></td>
+            </tr>
+        </table>
+        <h3>Nearby Institutions</h3>
+        <table>
+            <tr>
+                <th>Institute Name</th>
+                <th>Number of Students</th>
+                <th style="background-color: yellow;">Distance to Institute</th>
+            </tr>
+            <% r4.forEach(function(insti){ %>
+                <tr>
+                    <td><%=  insti.institute_name %></td>
+                    <td><%=  insti.student_enrollment_count %></td>
+                    <td style="background-color: yellow;"><%=  insti.INSTI_DISTANCE %></td>
+                </tr>
+            <% }) %>
+        </table>
+        <h3>Nearby PGs</h3>
+        <table>
+                <tr>
+                    <th>PG Address</th>
+                    <th>Distance to PG</th>
+                    <th>PG Rent</th>
+                </tr>
+                <% r5.forEach(function(pg){ %>
+                    <tr>
+                        <td><%=  pg.address %></td>
+                        <td><%=  pg.distance %></td>
+                        <td><%=  pg.PG_RENTAL %></td>
+                    </tr>
+                <% }) %>
+        </table>
+        <h3>Nearby Rental Rooms</h3>
+        <table>
+                <tr>
+                    <th>BHK</th>
+                    <th>Number of Properties</th>
+                    <th>Average Super Area</th>
+                    <th>Average Rent</th>
+                    <th>Averge Rent per SQFT</th>
+                    <th>Average Rent per Bed</th>
+                </tr>
+                <% r6.forEach(function(apar){ %>
+                    <tr>
+                        <td><%=  apar.BHK %></td>
+                        <td><%=  apar.NUM_PROPERTIES %></td>
+                        <td><%=  apar.AVG_SUPER_AREA %></td>
+                        <td><%=  apar.AVG_RENT %></td>
+                        <td><%=  apar.AVG_RENTALPERSQFT %></td>
+                        <td><%=  apar.AVG_RENT_PER_BED %></td>
+                    </tr>
+                <% }) %>
+        </table> </div></div>
+    </body>
+</html>

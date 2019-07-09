@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple Polygon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+    <link rel="stylesheet" href="cluster.css">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div style="width: 49%; height: 95vh; position: relative; float: left;">
+        <form class="ui form" action="/viewcluster" method="POST">
+          <div class="field">
+            <label>Number of Cluster for Institutions</label>
+            <input type="text" name="noofins" placeholder="Number of Cluster for Institutions">
+          </div>
+          <div class="field">
+            <label>Number of Cluster for PGs</label>
+            <input type="text" name="noofprop" placeholder="Number of Cluster for PGs">
+          </div>
+          <button class="ui button" type="submit">Submit</button>
+        </form>
+
+        <table id="InsCluster">
+          <tr>
+            <th>Cluster Number</th>
+            <th>Number of Institutions in Cluster</th>
+            <th>Number of Students</th>
+            <th>Mean Distance of Cluster</th>
+            <th>Max Distance of Cluster</th>
+          </tr>
+          <tr w3-repeat="Institution">
+            <td>{{CategoryNo}}</td>
+            <td>{{NoofIns}}</td>
+            <td>{{Enrollment}}</td>
+            <td>{{meandist}} KM</td>
+            <td>{{maxdist}} KM</td>
+          </tr>
+        </table>
+
+        <table id="PGCluster">
+          <tr>
+            <th>Cluster Number</th>
+            <th>Number of PGs in Cluster</th>
+            <th>Average Price</th>
+            <th>Mean Distance of Cluster</th>
+            <th>Max Distance of Cluster</th>
+          </tr>
+          <tr w3-repeat="PG">
+            <td>{{Clusno}}</td>
+            <td>{{NoofPg}}</td>
+            <td>{{Avgprice}}</td>
+            <td>{{meandist}} KM</td>
+            <td>{{maxdist}} KM</td>
+          </tr>
+        </table>
+
+      </div>
+      <div style="width: 49%; height: 95vh; float: left; position: relative;" >
+        <div style="height: 100%; width: 100%; position: fixed;" id ="map"></div>
+      </div>
+    </div>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script>
+      function initMap(){
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 10,
+          center: new google.maps.LatLng(12.969652, 77.593138),
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+          });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var ci = <%= ci %>;
+        console.log(ci[0])
+
+        var insobject = {"Institution":[]}
+
+        for(var x=0;x<=<%= noi %>-1;x++){  
+          var locations = [];
+          var lat,long,name;
+          var noofins = 0;
+          var catinsno = 0;
+          var enrollmentno = 0;
+          <% r1.forEach(function(ins){ %>
+              lat = <%= ins.Lat %>;
+              long = <%= ins.Long %>;
+              name = "<%= ins.InsN %>";
+              if(ci[noofins] == x){
+                console.log(name);
+                enrollmentno += <%= ins.StE %>;
+                catinsno++;
+                locations.push([lat,long,name]);
+              }
+              noofins++;
+          <% }); %>
+
+          
+
+          function orientation( px,py,qx,qy,rx,ry) 
+          { 
+              var val = (qy - py) * (rx - qx) - 
+                        (qx - px) * (ry - qy); 
+            
+              if (val == 0) return 0;  // colinear 
+              return (val > 0)? 1: 2; // clock or counterclock wise 
+          } 
+
+          var l = 0;
+          for(var i=0;i<locations.length;i++){
+            if(locations[l][1]>locations[i][1]){
+              l =i;
+            }
+          }
+
+          var polygoncords = [];
+
+          var p=l,q;
+          do{
+            polygoncords.push({lat:locations[p][0],lng:locations[p][1]});
+            q = (p+1)%(locations.length);
+            for(var i=0;i<locations.length;i++){
+              if(orientation(locations[p][1],locations[p][0],locations[i][1],locations[i][0],locations[q][1],locations[q][0])==2){
+                q = i;
+              }
+            }
+            p=q;
+          }while(p!=l);
+
+          console.log(locations);
+          console.log(polygoncords);
+
+          var bounds = new google.maps.LatLngBounds();
+
+          var poly = new google.maps.Polygon({
+          paths: polygoncords,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.2
+          });
+          poly.setMap(map);
+
+          for (var pathidx = 0; pathidx < poly.getPath().getLength(); pathidx++) {
+            bounds.extend(poly.getPath().getAt(pathidx));
+          }
+          poly.center = bounds.getCenter();
+
+          var meandist = 0;
+          var maxdist = 0;
+          locations.forEach(function(loc){
+            var tempdist = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(loc[0], loc[1]), new google.maps.LatLng(poly.center.lat(), poly.center.lng()));
+            if(tempdist>maxdist){
+              maxdist = tempdist;
+            }
+            meandist += tempdist;
+          });
+
+          console.log("Mean Distance of Cluster" + (meandist/catinsno).toFixed(2) )
+          console.log("Max Distace in Cluster"+ maxdist.toFixed(2))
+
+          insobject["Institution"].push({"CategoryNo":x+1,"NoofIns":catinsno,"Enrollment":enrollmentno,"meandist":((meandist/catinsno)/1000).toFixed(1),"maxdist": (maxdist/1000).toFixed(1)});
+
+          var infowindow = new google.maps.InfoWindow();
+          poly.addListener('click', (function(content) {
+            return function() {
+              // set the content
+              infowindow.setContent(content);
+              // set the position
+              infowindow.setPosition(this.center);
+              // open it
+              infowindow.open(map);
+            }
+          })("Institute Cluster :"+(x+1) + "<br />" +"Number of Institutes :" + catinsno+ "<br />"+"\nNumber of Students :" +enrollmentno+"<br />"+"Mean Distance :"+((meandist/catinsno)/1000).toFixed(1)+"<br />"+"Max Distance :"+(maxdist/1000).toFixed(1)));
+
+          var marker, i;
+
+          for (i = 0; i < locations.length; i++) {  
+          marker = new google.maps.Marker({
+              position: new google.maps.LatLng(locations[i][0], locations[i][1]),
+              map: map,
+              opacity:0
+          });
+
+          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+              return function() {
+              infowindow.setContent(locations[i][2]);
+              infowindow.open(map, marker);
+              }
+          })(marker, i));
+
+          }
+        }
+
+        w3.displayObject("InsCluster", insobject);
+
+        var cp = <%= cp %>
+
+        var pgobject = {"PG":[]}
+
+        for(var x=0;x<=<%= nop %>-1;x++){  
+          var locations = [];
+          var lat,long;
+          var noofprop = 0;
+          var cluspropno = 0;
+          var totalprice = 0;
+          <% r2.forEach(function(pg){ %>
+              lat = <%= pg.Lat %>;
+              long = <%= pg.Lng %>;
+              if(cp[noofprop] == x){
+                totalprice += <%= pg.Price %>
+                cluspropno += 1;
+                locations.push([lat,long]);
+              }
+              noofprop++;
+          <% }); %>
+
+          
+
+          function orientation( px,py,qx,qy,rx,ry) 
+          { 
+              var val = (qy - py) * (rx - qx) - 
+                        (qx - px) * (ry - qy); 
+            
+              if (val == 0) return 0;  // colinear 
+              return (val > 0)? 1: 2; // clock or counterclock wise 
+          } 
+
+          var l = 0;
+          for(var i=0;i<locations.length;i++){
+            if(locations[l][1]>locations[i][1]){
+              l =i;
+            }
+          }
+
+          var polygoncords = [];
+
+          var p=l,q;
+          do{
+            polygoncords.push({lat:locations[p][0],lng:locations[p][1]});
+            q = (p+1)%(locations.length);
+            for(var i=0;i<locations.length;i++){
+              if(orientation(locations[p][1],locations[p][0],locations[i][1],locations[i][0],locations[q][1],locations[q][0])==2){
+                q = i;
+              }
+            }
+            p=q;
+          }while(p!=l);
+
+          console.log(locations);
+          console.log(polygoncords);
+
+          var bounds = new google.maps.LatLngBounds();
+
+          var poly = new google.maps.Polygon({
+          paths: polygoncords,
+          strokeColor: '#00FF00',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#00FF00',
+          fillOpacity: 0.2
+          });
+          poly.setMap(map);
+
+          for (var pathidx = 0; pathidx < poly.getPath().getLength(); pathidx++) {
+            bounds.extend(poly.getPath().getAt(pathidx));
+          }
+          poly.center = bounds.getCenter();
+
+          var meandist = 0;
+          var maxdist = 0;
+          locations.forEach(function(loc){
+            var tempdist = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(loc[0], loc[1]), new google.maps.LatLng(poly.center.lat(), poly.center.lng()));
+            if(tempdist>maxdist){
+              maxdist = tempdist;
+            }
+            meandist += tempdist;
+          });
+
+          pgobject["PG"].push({"Clusno":x+1,"NoofPg":cluspropno,"Avgprice":(totalprice/cluspropno).toFixed(2),"meandist":((meandist/cluspropno)/1000).toFixed(1),"maxdist":(maxdist/1000).toFixed(1)});
+
+          var infowindow = new google.maps.InfoWindow();
+          poly.addListener('click', (function(content) {
+            return function() {
+              // set the content
+              infowindow.setContent(content);
+              // set the position
+              infowindow.setPosition(this.center);
+              // open it
+              infowindow.open(map);
+            }
+          })("PG Cluster :"+(x+1) + "<br />" + "Number of PGs :"+ cluspropno +"<br />"+"Average Price :"+ (totalprice/cluspropno).toFixed(2) + "<br />"+"Mean Distance :"+((meandist/cluspropno)/1000).toFixed(1) +"<br />"+"Max Distance :"+(maxdist/1000).toFixed(1)  ));
+
+          var marker, i;
+
+          for (i = 0; i < locations.length; i++) {  
+          marker = new google.maps.Marker({
+              position: new google.maps.LatLng(locations[i][0], locations[i][1]),
+              map: map,
+              opacity : 0
+          });
+
+          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+              return function() {
+              infowindow.setContent(locations[i][2]);
+              infowindow.open(map, marker);
+              }
+          })(marker, i));
+
+          }
+        }
+
+        w3.displayObject("PGCluster", pgobject);
+      }
+    </script>
+
+    <script>
+        var a = <%= r1.length %>;
+        console.log(a);
+    </script>
+
+
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6C0YsGGJxR7rcDicsDyT9aiMn_JdaUo4&libraries=geometry&callback=initMap">
+    </script>
+  </body>
+</html>

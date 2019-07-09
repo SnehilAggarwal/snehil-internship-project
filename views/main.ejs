@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stanza Map</title>
+    <link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="C:\Users\SNEHIL AGGARWAL\Desktop\MAP DISPLAY\map.css">
+</head>
+<body>	
+        <table>
+            <tr>
+                <th>#Institutions</th>
+                <th>#PGs</th>
+                <th>#Rentals</th>
+            </tr>
+            <tr>
+                <td><%= r1[0].CNT_INS %></td>
+                <td><%= r2[0].CNT_PG %></td>
+                <td><%= r3[0].CNT_RENT %></td>
+            </tr>
+        </table>
+        
+		<h1 class="ui center aligned icon header">Map Appliction</h1>
+        <form action="/viewtable" method="POST" target="_blank">
+            <label>City Name</label>
+            <div class="ui fluid search selection dropdown">
+                <input type="hidden" name="city">
+                <i class="dropdown icon"></i>
+                <div class="default text text2">Select City</div>
+                <div class="menu">
+                <div class="item"><i class="building outline icon"></i>Delhi</div>
+                <div class="item"><i class="building outline icon"></i>Mumbai</div>
+                <div class="item"><i class="building outline icon"></i>Chennai</div>
+                <div class="item"><i class="building outline icon"></i>Kolkata</div>
+                <div class="item"><i class="building outline icon"></i>Noida</div>
+                <div class="item"><i class="building outline icon"></i>Gurgaon</div>
+                <div class="item"><i class="building outline icon"></i>Bangalore</div>
+                <div class="item"><i class="building outline icon"></i>Hyderabad</div>
+                <div class="item"><i class="building outline icon"></i>NaviMumbai</div>
+                <div class="item"><i class="building outline icon"></i>Pune</div>
+                </div>
+            </div>
+            <button>View Table</button>
+        </form>
+        <button class="viewmap">View Map</button>
+
+        <h1 class="ui center aligned icon header">Real Estate Appliction</h1>
+        <form class="ui form" action="/viewestatetable" method="POST" target="_blank">
+            <div class="ui fluid search selection dropdown">
+                <input type="hidden" name="city2">
+                <i class="dropdown icon"></i>
+                <div class="default text">Select City</div>
+                <div class="menu">
+                <div class="item"><i class="building outline icon"></i>Delhi</div>
+                <div class="item"><i class="building outline icon"></i>Mumbai</div>
+                <div class="item"><i class="building outline icon"></i>Chennai</div>
+                <div class="item"><i class="building outline icon"></i>Kolkata</div>
+                <div class="item"><i class="building outline icon"></i>Noida</div>
+                <div class="item"><i class="building outline icon"></i>Gurgaon</div>
+                <div class="item"><i class="building outline icon"></i>Bangalore</div>
+                <div class="item"><i class="building outline icon"></i>Hyderabad</div>
+                <div class="item"><i class="building outline icon"></i>NaviMumbai</div>
+                <div class="item"><i class="building outline icon"></i>Pune</div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Latitude</label>
+                <input type="text" name="lat" placeholder="Latitude">
+            </div>
+            <div class="field">
+                <label>Longitude</label>
+                <input type="text" name="long" placeholder="Longitude">
+            </div>
+            <button>View Table + Map</button>
+        </form>
+        
+        <h1 class="ui center aligned icon header">Cluster Application</h1>
+        <form class="ui form" action="/viewcluster" method="POST" target="_blank">
+            <div class="ui fluid search selection dropdown">
+                <input type="hidden" name="city2">
+                <i class="dropdown icon"></i>
+                <div class="default text">Select City</div>
+                <div class="menu">
+                <div class="item"><i class="building outline icon"></i>Delhi</div>
+                <div class="item"><i class="building outline icon"></i>Mumbai</div>
+                <div class="item"><i class="building outline icon"></i>Chennai</div>
+                <div class="item"><i class="building outline icon"></i>Kolkata</div>
+                <div class="item"><i class="building outline icon"></i>Noida</div>
+                <div class="item"><i class="building outline icon"></i>Gurgaon</div>
+                <div class="item"><i class="building outline icon"></i>Bangalore</div>
+                <div class="item"><i class="building outline icon"></i>Hyderabad</div>
+                <div class="item"><i class="building outline icon"></i>NaviMumbai</div>
+                <div class="item"><i class="building outline icon"></i>Pune</div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Number of Cluster for Institutions</label>
+                <input type="text" name="noofins" placeholder="Number of Cluster for Institutions">
+            </div>
+            <div class="field">
+                <label>Number of Cluster for PGs</label>
+                <input type="text" name="noofprop" placeholder="Number of Cluster for PGs">
+            </div>
+            <button class="ui button" type="submit">Submit</button>
+        </form>
+
+        <form action="/viewpython" method="POST" target="_blank">
+            <button>View Python</button>
+        </form>
+
+        <script >
+            $(document).ready(function(){
+            $(".ui.dropdown").dropdown();
+
+            $(".viewmap").click(function(){
+                    var city = $(".text2").text()
+                    console.log(city)
+
+                    var mapurl = {
+                        NaviMumbai : "https://www.google.com/maps/d/viewer?mid=18zvTSJJfkNqfE-szAo3kPYlpyATvC7q4&ll=19.064594769062953%2C73.03241229038667&z=13",
+                        Mumbai : "https://www.google.com/maps/d/viewer?mid=1ZdVy2DWblS_c2qLIS2UFd0il53u6X9Dg&ll=19.104715516318194%2C72.86879179659036&z=13",
+                        Delhi : "https://www.google.com/maps/d/viewer?mid=11A2Zz1abR_f1vihblNR5RJ7nF-ydJJH1&ll=28.622484089520352%2C77.1960699213414&z=12",
+                        Pune : "https://www.google.com/maps/d/viewer?mid=19pr3IBwtZbdC-38v0oA3CYPMnzDrXWVJ&ll=18.511083657603294%2C73.85052654228843&z=13",
+                        Bangalore : "https://www.google.com/maps/d/viewer?mid=14EwugpGhHhBsjwrKdAgYX172hWxF2OhD&ll=12.94994538166157%2C77.57822350392473&z=13",
+                        Hyderabad : "https://www.google.com/maps/d/viewer?mid=13pQsZZh5sp4_6ZLylI6R5X3CQa4mAGRj&ll=17.414195705590593%2C78.4563894823093&z=12",
+                        Kolkata : "https://www.google.com/maps/d/viewer?mid=1xxocRyzno76gbmT0r5vUGWpc2F4KX9xx&ll=22.57298674229869%2C88.43813193210576&z=12",
+                        Noida : "https://www.google.com/maps/d/viewer?mid=1ZdvbaHIkEzBfmYnuWMO8OxNnYz-ppqTP&ll=28.57588894328385%2C77.38020755645994&z=13",
+                        Gurgaon : "https://www.google.com/maps/d/viewer?mid=1k1gSHIy04-5r8bWzlsmZ4e1iV4NnUojv&ll=28.466788968573688%2C77.06832209449453&z=13",
+                        Chennai : "https://www.google.com/maps/d/viewer?mid=1AJWM1rm3ote4WryvB6gJbKgK0-R-x8Kd&ll=12.97548201822228%2C80.21382908972589&z=12"
+                    }
+                    var url = mapurl[city]
+                    console.log(url)
+                    window.open(url)
+            });
+
+
+        });
+        </script>
+</body>
+</html>
