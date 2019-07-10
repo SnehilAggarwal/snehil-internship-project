@@ -160,13 +160,34 @@ app.post("/viewestatetable",function(req,res){
 });
 
 app.post("/viewcluster",function(req,res){
+    console.log(req.body)
+    var city = (req.body.city3);
+    console.log(city);
+    var i;
+    for(i = city.length-1; ;i--){
+        if(city[i]=='>'){
+            break;
+        }
+    }
+    i++;
+    city = city.substring(i);
+    city = city.charAt(0).toUpperCase() + city.slice(1)
+    if(city=="Delhi"){
+        city = "New Delhi";
+    }
+    if(city=="Navimumbai"){
+        city = "Navi Mumbai";
+    }
+    console.log(city);
+
     var noofins = parseInt(req.body.noofins);
     var noofprop = parseInt(req.body.noofprop)
-    q1 = "SELECT Lat, Banglore_ins2.Long ,Institution_Name as InsN,Student_Enrollments as StE from locator.Banglore_ins2;"
+    q1 = "SELECT latitude as Lat, longitude as \"Long\" ,institute_name as InsN,student_enrollment_count as StE from locator.INSTITUTIONS where latitude is NOT NULL and city_name = \'Bangalore\' ;"
     con.query(q1,function(err,r1){
         if(err) throw err
         console.log(r1)
         q2 = "SELECT Latitude as Lat,Longitude as Lng ,Price FROM locator.Banglore_prop_cluster;"
+        q2new = "SELECT latitude as Lat,longitude as Lng, formatted_price as Price FROM locator.EXISTING_PROPERTIES where address_region='Bangalore';"
         con.query(q2,function(err,r2){
             if(err) throw err
             console.log(r2)
