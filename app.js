@@ -182,7 +182,7 @@ app.post("/viewcluster",function(req,res){
 
     var noofins = parseInt(req.body.noofins);
     var noofprop = parseInt(req.body.noofprop)
-    q1 = "SELECT latitude as Lat, longitude as \"Long\" ,institute_name as InsN,student_enrollment_count as StE from locator.INSTITUTIONS where latitude is NOT NULL and city_name = \'Bangalore\' ;"
+    q1 = "SELECT latitude as Lat, longitude as \"Long\" ,institute_name as InsN,student_enrollment_count as StE from locator.INSTITUTIONS where latitude is NOT NULL and city_name = \'" + city +"\' ;"
     con.query(q1,function(err,r1){
         if(err) throw err
         console.log(r1)
@@ -192,7 +192,7 @@ app.post("/viewcluster",function(req,res){
             if(err) throw err
             console.log(r2)
             var childprocess = require("child_process");
-            childprocess.exec('py ./cluster_ins.py '+noofins,function(err,ci,stderr){
+            childprocess.exec('py ./cluster_ins.py '+noofins+' '+city,function(err,ci,stderr){
                 if(err) throw err
                 console.log(ci);
                 childprocess.exec('py ./cluster_prop.py '+noofprop,function(err,cp,stderr){

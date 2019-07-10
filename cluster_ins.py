@@ -6,9 +6,17 @@ from itertools import cycle
 from pandas.io import sql
 from sqlalchemy import create_engine
 
+city = ''
+if(sys.argv[2]=="New"):
+    city = 'New Delhi'
+elif(sys.argv[2]=="Navi"):
+    city = "Navi Mumbai"
+else:
+    city = sys.argv[2]
+
 engine = create_engine('mysql://stanzanewdb:stanzanewdb@backend-training.cldq4iyr6wzu.ap-south-1.rds.amazonaws.com/locator')
 with engine.connect() as conn, conn.begin():
-    dataset = pd.read_sql("SELECT * from locator.INSTITUTIONS where latitude is NOT NULL and city_name = \"Bangalore\";",conn)
+    dataset = pd.read_sql("SELECT * from locator.INSTITUTIONS where latitude is NOT NULL and city_name = \""+ city +"\";",conn)
 
 X = dataset.iloc[:,[11,12]].values
 
